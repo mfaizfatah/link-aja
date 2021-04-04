@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 
+	_ "github.com/joho/godotenv/autoload"
 	"github.com/mfaizfatah/link-aja/adapter"
 	"github.com/mfaizfatah/link-aja/config"
 	"github.com/mfaizfatah/link-aja/controller"
