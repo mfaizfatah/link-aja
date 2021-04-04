@@ -1,0 +1,64 @@
+version: '3'
+services:
+  app:
+    container_name: link-aja
+    build: .
+    ports: 
+      - 8080:8080 
+    restart: on-failure
+    volumes:
+      - api:/usr/src/app/
+    depends_on:
+      - fullstack-mysql          
+    networks:
+      - fullstack
+    environment:
+      - TEST_ENV=production
+      - SERVER_PORT=8080
+      - TIMEOUT=20
+      - DB_DRIVER=mysql
+      - DB_URI=root:root@tcp(fullstack-mysql:3306)/link-aja?charset=utf8&parseTime=True
+
+  fullstack-mysql:
+    image: mariadb:10.3
+    container_name: mariadb
+    ports: 
+      - 3306:3306
+    environment: 
+      - MYSQL_ROOT_HOST=%
+      - MYSQL_USER=app
+      - MYSQL_PASSWORD=app123
+      - MYSQL_DATABASE=link-aja
+      - MYSQL_ROOT_PASSWORD=root
+    volumes:
+      - database_mysql:/var/lib/mysql
+      - ./link-aja.sql:/docker-entrypoint-initdb.d/link-aja.sql
+    # command: --disable-partition-engine-check
+    networks:
+      - fullstack
+  
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin_container
+    depends_on:
+      - fullstack-mysql
+    environment:
+      - PMA_HOST=fullstack-mysql # Note the "fullstack-mysql". Must be the name of the what you used as the mysql service.
+      - PMA_USER=root
+      - PMA_PORT=3306
+      - PMA_PASSWORD=root
+    ports:
+      - 9090:80
+    restart: always
+    networks:
+      - fullstack
+
+
+volumes:
+  api:
+  database_mysql:                  
+
+# Networks to be created to facilitate communication between containers
+networks:
+  fullstack:
+    driver: bridge

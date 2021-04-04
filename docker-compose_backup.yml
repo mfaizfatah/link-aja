@@ -1,0 +1,10 @@
+version: '2'
+services:
+  sample-go:
+    build: ./
+    environment:
+      - TEST_ENV=test
+      - SERVER_PORT=8080
+      - TIMEOUT=20
+      - DB_DRIVER=mysql
+      - DB_URI=root:app123@tcp(172.17.0.2:3308)/link-aja?charset=utf8&parseTime=True
