@@ -3,13 +3,14 @@ package main
 import (
 	"os"
 
+	"projects/adapter"
+	"projects/config"
+	"projects/controller"
+	"projects/repository"
+	"projects/router"
+	"projects/usecase"
+
 	_ "github.com/joho/godotenv/autoload"
-	"github.com/mfaizfatah/link-aja/adapter"
-	"github.com/mfaizfatah/link-aja/config"
-	"github.com/mfaizfatah/link-aja/controller"
-	"github.com/mfaizfatah/link-aja/repository"
-	"github.com/mfaizfatah/link-aja/router"
-	"github.com/mfaizfatah/link-aja/usecase"
 )
 
 func init() {

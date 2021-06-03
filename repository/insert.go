@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"github.com/mfaizfatah/link-aja/model"
+	"projects/model"
 )
 
 func (r *repo) InsertTransfer(transfer model.Transfer) error {

@@ -4,8 +4,9 @@ import (
 	"os"
 	"strings"
 
+	"projects/adapter"
+
 	_ "github.com/joho/godotenv/autoload"
-	"github.com/mfaizfatah/link-aja/adapter"
 )
 
 /*LoadConfig is for load all configuration, connection etc

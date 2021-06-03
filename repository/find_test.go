@@ -5,9 +5,9 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/mfaizfatah/link-aja/adapter"
-	"github.com/mfaizfatah/link-aja/config"
-	"github.com/mfaizfatah/link-aja/model"
+	"projects/adapter"
+	"projects/config"
+	"projects/model"
 )
 
 func init() {
@@ -15,7 +15,7 @@ func init() {
 		"SERVER_PORT": "8080",
 		"TIMEOUT":     "20",
 		"DB_DRIVER":   "mysql",
-		"DB_URI":      "root:app123@tcp(127.0.0.1:3308)/link-aja?charset=utf8&parseTime=True",
+		"DB_URI":      "root:@tcp(127.0.0.1:3306)/link-aja?charset=utf8&parseTime=True",
 		"DB_USER":     "root",
 		"DB_HOST":     "127.0.0.1",
 		"DB_PASSWORD": "app123",

@@ -5,9 +5,10 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/mfaizfatah/link-aja/adapter"
-	"github.com/mfaizfatah/link-aja/repository"
-	"github.com/mfaizfatah/link-aja/usecase"
+	"projects/adapter"
+
+	"projects/repository"
+	"projects/usecase"
 )
 
 func Test_ctrl_Transfer(t *testing.T) {

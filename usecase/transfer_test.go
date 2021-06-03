@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/mfaizfatah/link-aja/adapter"
-	"github.com/mfaizfatah/link-aja/model"
-	"github.com/mfaizfatah/link-aja/repository"
+	"projects/adapter"
+	"projects/model"
+	"projects/repository"
 )
 
 func Test_uc_Transfer(t *testing.T) {

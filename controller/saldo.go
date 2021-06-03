@@ -3,8 +3,9 @@ package controller
 import (
 	"net/http"
 
+	"projects/utils"
+
 	"github.com/go-chi/chi"
-	"github.com/mfaizfatah/link-aja/utils"
 )
 
 func (c *ctrl) CheckSaldo(w http.ResponseWriter, r *http.Request) {

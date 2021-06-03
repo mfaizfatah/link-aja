@@ -3,7 +3,7 @@ package controller
 import (
 	"net/http"
 
-	"github.com/mfaizfatah/link-aja/usecase"
+	"projects/usecase"
 )
 
 // ctrl struct with value interface Usecases

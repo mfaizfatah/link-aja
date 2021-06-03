@@ -6,7 +6,7 @@ import (
 
 	"net/http"
 
-	"github.com/mfaizfatah/link-aja/model"
+	"projects/model"
 )
 
 func (r *uc) Transfer(ctx context.Context, transfer model.Transfer) (context.Context, interface{}, string, int, error) {

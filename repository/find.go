@@ -4,8 +4,9 @@ import (
 	"errors"
 	"fmt"
 
+	"projects/model"
+
 	"github.com/jinzhu/gorm"
-	"github.com/mfaizfatah/link-aja/model"
 )
 
 func (u *repo) GetSaldo(accNumber string) (*model.Saldo, error) {

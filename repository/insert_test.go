@@ -3,8 +3,8 @@ package repository
 import (
 	"testing"
 
-	"github.com/mfaizfatah/link-aja/adapter"
-	"github.com/mfaizfatah/link-aja/model"
+	"projects/adapter"
+	"projects/model"
 )
 
 func Test_repo_InsertTransfer(t *testing.T) {

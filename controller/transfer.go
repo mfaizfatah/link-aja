@@ -5,9 +5,10 @@ import (
 	"log"
 	"net/http"
 
+	"projects/model"
+	"projects/utils"
+
 	"github.com/go-chi/chi"
-	"github.com/mfaizfatah/link-aja/model"
-	"github.com/mfaizfatah/link-aja/utils"
 )
 
 func (c *ctrl) Transfer(w http.ResponseWriter, r *http.Request) {

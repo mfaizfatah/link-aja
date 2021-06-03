@@ -3,8 +3,8 @@ package usecase
 import (
 	"context"
 
-	"github.com/mfaizfatah/link-aja/model"
-	"github.com/mfaizfatah/link-aja/repository"
+	"projects/model"
+	"projects/repository"
 )
 
 // uc struct with value interface Repository
