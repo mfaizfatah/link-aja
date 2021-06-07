@@ -1,13 +1,19 @@
 package repository
 
 import (
+	"errors"
+	"fmt"
+	"log"
 	"os"
 	"reflect"
 	"testing"
 
-	"projects/adapter"
-	"projects/config"
 	"projects/model"
+
+	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/stretchr/testify/assert"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 )
 
 func init() {
@@ -26,13 +32,32 @@ func init() {
 		os.Setenv(key, value)
 	}
 
-	config.LoadConfig("link-aja-api")
+	// config.LoadConfig("link-aja-api")
 }
 
 func Test_repo_GetSaldo(t *testing.T) {
-	db := adapter.DBSQL()
+	// db := adapter.DBSQL()
 
-	repo := NewRepo(db)
+	db, mock, err := sqlmock.New() // mock sql.DB
+	assert.NoError(t, err)
+	defer db.Close()
+
+	dialector := mysql.New(mysql.Config{
+		DSN:                       "sqlmock_db_0",
+		DriverName:                "mysql",
+		Conn:                      db,
+		SkipInitializeWithVersion: true,
+	})
+
+	gdb, err := gorm.Open(dialector, &gorm.Config{}) // open gorm db
+	assert.NoError(t, err)
+
+	repo := NewRepo(gdb)
+
+	var columns []string
+	columns = append(columns, []string{
+		"account_number", "balance",
+	}...)
 
 	type args struct {
 		accNumber string
@@ -40,6 +65,7 @@ func Test_repo_GetSaldo(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
+		rows    *sqlmock.Rows
 		want    *model.Saldo
 		wantErr bool
 	}{
@@ -49,25 +75,34 @@ func Test_repo_GetSaldo(t *testing.T) {
 			args: args{
 				accNumber: "555001",
 			},
+			rows: sqlmock.NewRows(columns).AddRow("555001", 10000),
 			want: &model.Saldo{
 				AccounNumber: "555001",
 				Balance:      10000,
-				Name:         "Bob Martin",
 			},
 			wantErr: false,
 		},
 		{
 			name: "not found",
 			args: args{
-				accNumber: "555009",
+				accNumber: "9999",
 			},
-			want:    nil,
+			rows: sqlmock.NewRows(columns).AddRow("5", "one").RowError(2, errors.New("nil documents")),
+			want: &model.Saldo{
+				AccounNumber: "5",
+				Balance:      0,
+			},
 			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+
+			query := fmt.Sprintf(`SELECT account.account_number, customer.name, account.balance FROM account INNER JOIN customer ON account.customer_number = customer.customer_number WHERE account.account_number = %v`, tt.args.accNumber)
+			mock.ExpectQuery(query).WillReturnRows(tt.rows)
+
 			got, err := repo.GetSaldo(tt.args.accNumber)
+			log.Print(got)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("repo.GetSaldo() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -75,6 +110,7 @@ func Test_repo_GetSaldo(t *testing.T) {
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("repo.GetSaldo() = %v, want %v", got, tt.want)
 			}
+
 		})
 	}
 }

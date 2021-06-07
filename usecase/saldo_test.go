@@ -2,13 +2,17 @@ package usecase
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"os"
 	"testing"
 
-	"projects/adapter"
-	"projects/config"
 	"projects/repository"
+
+	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/stretchr/testify/assert"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 )
 
 func init() {
@@ -27,14 +31,35 @@ func init() {
 		os.Setenv(key, value)
 	}
 
-	config.LoadConfig("link-aja-api")
+	// config.LoadConfig("link-aja-api")
 }
 
 func Test_uc_CheckSaldo(t *testing.T) {
-	db := adapter.DBSQL()
+	db, mock, err := sqlmock.New() // mock sql.DB
+	assert.NoError(t, err)
+	defer db.Close()
 
-	repo := repository.NewRepo(db)
+	dialector := mysql.New(mysql.Config{
+		DSN:                       "sqlmock_db_0",
+		DriverName:                "mysql",
+		Conn:                      db,
+		SkipInitializeWithVersion: true,
+	})
+
+	gdb, err := gorm.Open(dialector, &gorm.Config{}) // open gorm db
+	assert.NoError(t, err)
+
+	repo := repository.NewRepo(gdb)
+
+	var columns []string
+	columns = append(columns, []string{
+		"account_number", "balance",
+	}...)
+
 	usecase := NewUC(repo)
+
+	query := fmt.Sprintf(`SELECT account.account_number, customer.name, account.balance FROM account INNER JOIN customer ON account.customer_number = customer.customer_number WHERE account.account_number = %v`, 555001)
+	mock.ExpectQuery(query).WillReturnRows(sqlmock.NewRows(columns).AddRow("555001", 10000))
 
 	type args struct {
 		ctx       context.Context

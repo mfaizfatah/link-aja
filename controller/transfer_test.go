@@ -1,20 +1,41 @@
 package controller
 
 import (
+	"bytes"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	"projects/adapter"
-
 	"projects/repository"
 	"projects/usecase"
+
+	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/stretchr/testify/assert"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 )
 
 func Test_ctrl_Transfer(t *testing.T) {
-	db := adapter.DBSQL()
+	db, _, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual)) // mock sql.DB
+	assert.NoError(t, err)
+	defer db.Close()
 
-	repo := repository.NewRepo(db)
+	dialector := mysql.New(mysql.Config{
+		DSN:                       "sqlmock_db_0",
+		DriverName:                "mysql",
+		Conn:                      db,
+		SkipInitializeWithVersion: true,
+	})
+
+	gdb, err := gorm.Open(dialector, &gorm.Config{}) // open gorm db
+	assert.NoError(t, err)
+
+	var columns []string
+	columns = append(columns, []string{
+		"account_number", "balance",
+	}...)
+
+	repo := repository.NewRepo(gdb)
 	usecase := usecase.NewUC(repo)
 	ctrl := NewCtrl(usecase)
 
@@ -33,11 +54,11 @@ func Test_ctrl_Transfer(t *testing.T) {
 	}
 
 	for _, cases := range s {
-		req, _ := http.NewRequest(http.MethodPost, cases.url, nil)
+		req, _ := http.NewRequest(http.MethodPost, cases.url, bytes.NewBuffer([]byte(cases.content)))
 		req.Header.Set("Content-Type", "application/json")
 
 		t.Run(cases.name, func(t *testing.T) {
-			ctrl.CheckSaldo(httptest.NewRecorder(), req)
+			ctrl.Transfer(httptest.NewRecorder(), req)
 		})
 	}
 }

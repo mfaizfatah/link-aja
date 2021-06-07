@@ -6,10 +6,13 @@ import (
 	"os"
 	"testing"
 
-	"projects/adapter"
-	"projects/config"
 	"projects/repository"
 	"projects/usecase"
+
+	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/stretchr/testify/assert"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 )
 
 func init() {
@@ -28,13 +31,30 @@ func init() {
 		os.Setenv(key, value)
 	}
 
-	config.LoadConfig("link-aja-api")
+	// config.LoadConfig("link-aja-api")
 }
 
 func Test_ctrl_CheckSaldo(t *testing.T) {
-	db := adapter.DBSQL()
+	db, _, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual)) // mock sql.DB
+	assert.NoError(t, err)
+	defer db.Close()
 
-	repo := repository.NewRepo(db)
+	dialector := mysql.New(mysql.Config{
+		DSN:                       "sqlmock_db_0",
+		DriverName:                "mysql",
+		Conn:                      db,
+		SkipInitializeWithVersion: true,
+	})
+
+	gdb, err := gorm.Open(dialector, &gorm.Config{}) // open gorm db
+	assert.NoError(t, err)
+
+	var columns []string
+	columns = append(columns, []string{
+		"account_number", "balance",
+	}...)
+
+	repo := repository.NewRepo(gdb)
 	usecase := usecase.NewUC(repo)
 	ctrl := NewCtrl(usecase)
 
